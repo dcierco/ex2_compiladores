@@ -55,7 +55,8 @@ NL  = \n | \r | \r\n
 {NUM}  { yyparser.yylval = new ParserVal(yytext()); 
          return Parser.NUM; }
 
-"=="   {  return Parser.EQ; }
+"++"   {  return Parser.INC;  }
+"=="   {  return Parser.EQ;  }
 "<="   {  return Parser.LEQ; }
 ">="   {  return Parser.GEQ; }
 "!="   {  return Parser.NEQ; }

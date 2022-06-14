@@ -6,13 +6,13 @@
 %}
  
 
-%token ID, INT, FLOAT, BOOL, NUM, LIT, VOID, MAIN, READ, WRITE, IF, ELSE
+%token ID, INT, FLOAT, BOOL, NUM, LIT, VOID, MAIN, READ, WRITE, IF, ELSE, INC
 %token WHILE,TRUE, FALSE, IF, ELSE
 %token EQ, LEQ, GEQ, NEQ 
 %token AND, OR
 
 %right '='
-%left OR
+%left OR INC
 %left AND
 %left  '>' '<' EQ LEQ GEQ NEQ
 %left '+' '-'
@@ -50,10 +50,9 @@ lcmd : lcmd cmd
 	   |
 	   ;
 	   
-cmd :  ID '=' exp	';' {  System.out.println("\tPOPL %EDX");
-  						   System.out.println("\tMOVL %EDX, _"+$1);
-					     }
+cmd :  exp	';' 
 			| '{' lcmd '}' { System.out.println("\t\t# terminou o bloco..."); }
+ 
 					     
 					       
       | WRITE '(' LIT ')' ';' { strTab.add($3);
@@ -102,7 +101,22 @@ cmd :  ID '=' exp	';' {  System.out.println("\tPOPL %EDX");
 							System.out.printf("rot_%02d:\n",(int)pRot.peek()+1);
 							pRot.pop();
 							}  
-							
+	| FOR {
+					pRot.push(proxRot);  proxRot += 2;
+					System.out.printf("rot_%02d:\n",pRot.peek());
+				  } 
+			 '(' decl ';' exp ';' exp ')' ;  {
+			 							System.out.println("\tPOPL %EAX   # desvia se falso...");
+											System.out.println("\tCMPL $0, %EAX");
+											System.out.printf("\tJE rot_%02d\n", (int)pRot.peek()+1);
+										} 
+				cmd		{
+				  		System.out.printf("\tJMP rot_%02d   # terminou cmd na linha de cima\n", pRot.peek());
+							System.out.printf("rot_%02d:\n",(int)pRot.peek()+1);
+							pRot.pop();
+							}  
+
+			
 			| IF '(' exp {	
 											pRot.push(proxRot);  proxRot += 2;
 															
@@ -137,15 +151,23 @@ restoIf : ELSE  {
 exp :  NUM  { System.out.println("\tPUSHL $"+$1); } 
     |  TRUE  { System.out.println("\tPUSHL $1"); } 
     |  FALSE  { System.out.println("\tPUSHL $0"); }      
- 		| ID   { System.out.println("\tPUSHL _"+$1); }
+ 	|  ID   { System.out.println("\tPUSHL _"+$1); }
     | '(' exp	')' 
     | '!' exp       { gcExpNot(); }
      
+		| ID '=' exp { System.out.println("\tPOPL %EDX");
+  						System.out.println("\tMOVL %EDX, _"+$1);
+						System.out.println("\tPUSHL %EDX");}
+
 		| exp '+' exp		{ gcExpArit('+'); }
 		| exp '-' exp		{ gcExpArit('-'); }
 		| exp '*' exp		{ gcExpArit('*'); }
 		| exp '/' exp		{ gcExpArit('/'); }
 		| exp '%' exp		{ gcExpArit('%'); }
+		| ID INC			{ System.out.println("\tPUSHL %EBX");
+   							System.out.println("\tPUSHL 1");
+							gcExpArit('+');
+							}
 																			
 		| exp '>' exp		{ gcExpRel('>'); }
 		| exp '<' exp		{ gcExpRel('<'); }											
