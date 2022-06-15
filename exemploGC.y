@@ -6,8 +6,8 @@
 %}
  
 
-%token ID, INT, FLOAT, BOOL, NUM, LIT, VOID, MAIN, READ, WRITE, IF, ELSE, INC
-%token WHILE,TRUE, FALSE, IF, ELSE
+%token ID, INT, FLOAT, BOOL, NUM, LIT, VOID, MAIN, READ, WRITE, IF, ELSE, INC, FOR
+%token WHILE, TRUE, FALSE, IF, ELSE
 %token EQ, LEQ, GEQ, NEQ 
 %token AND, OR
 
@@ -101,11 +101,10 @@ cmd :  exp	';'
 							System.out.printf("rot_%02d:\n",(int)pRot.peek()+1);
 							pRot.pop();
 							}  
-	| FOR {
-					pRot.push(proxRot);  proxRot += 2;
-					System.out.printf("rot_%02d:\n",pRot.peek());
-				  } 
-			 '(' decl ';' exp ';' exp ')' ;  {
+	| FOR '(' decl ';' {
+
+
+						} exp ';' exp ')'  {
 			 							System.out.println("\tPOPL %EAX   # desvia se falso...");
 											System.out.println("\tCMPL $0, %EAX");
 											System.out.printf("\tJE rot_%02d\n", (int)pRot.peek()+1);
@@ -164,8 +163,7 @@ exp :  NUM  { System.out.println("\tPUSHL $"+$1); }
 		| exp '*' exp		{ gcExpArit('*'); }
 		| exp '/' exp		{ gcExpArit('/'); }
 		| exp '%' exp		{ gcExpArit('%'); }
-		| ID INC			{ System.out.println("\tPUSHL %EBX");
-   							System.out.println("\tPUSHL 1");
+		| exp INC			{System.out.println("\tPUSHL 1");
 							gcExpArit('+');
 							}
 																			

@@ -1,5 +1,8 @@
 # Compiled class file
 *.class
+*.output
+Parser.java
+Yylex.java
 
 # Log file
 *.log
