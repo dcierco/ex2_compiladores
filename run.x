@@ -8,5 +8,5 @@ java Parser $ARQ.cmm >$ARQ.s
 #ld -o $ARQ   $ARQ.o
 
 # 64 bits 
-as --32 -o $ARQ.o $ARQ.s
-ld -m elf_i386 -s -o $ARQ   $ARQ.o
+#as --32 -o $ARQ.o $ARQ.s
+#ld -m elf_i386 -s -o $ARQ   $ARQ.o
